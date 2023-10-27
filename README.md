@@ -1,5 +1,5 @@
 
-LESSON SIX 
+LESSON FIVE 
 SUMMARY
 
 Spring Boot is an extension of the Spring framework, eliminating much of the boilerplate and configuration that characterizes Spring. 
