@@ -10,11 +10,12 @@ import com.gebeya.Friend.Service.FriendService;
 @SpringBootTest
 class FriendApplicationTests {
 
-	//@Autowired
-	//FriendService friendService;
+	@Autowired
+	FriendService friendService;
+	
 	@Test
 	void contextLoads() {
-		//Assertions.assertNotNull(friendService);
+		Assertions.assertNotNull(friendService);
 	}
 
 }
