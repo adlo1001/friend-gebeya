@@ -9,7 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-
+import javax.validation.constraints.Min;
 
 @Entity
 public class Friend {
@@ -23,6 +23,7 @@ public class Friend {
 //	@JsonProperty("last-name")
 	private String lastName;
 
+	@Min(value = 18)
 	private int age;
 
 	@OneToMany(cascade = CascadeType.ALL)
@@ -31,6 +32,7 @@ public class Friend {
 
 	// @JsonIgnore
 	private boolean married;
+
 	public Friend() {
 		super();
 	}

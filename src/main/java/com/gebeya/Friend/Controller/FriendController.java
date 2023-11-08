@@ -3,6 +3,8 @@ package com.gebeya.Friend.Controller;
 import java.util.Locale;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +13,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,8 +26,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gebeya.Friend.Exceptions.ErrorMessage;
 import com.gebeya.Friend.Model.Friend;
 import com.gebeya.Friend.Service.FriendService;
 
@@ -55,8 +62,14 @@ public class FriendController {
 
 	}
 
+	@GetMapping("/friends")
+	public Iterable<Friend> getAllFriend() {
+		return friendService.findAll();
+
+	}
+
 	@GetMapping("/friend")
-	public Page<Friend> getAllFriend(@RequestParam("p")int page, @RequestParam("s")int size) {
+	public Page<Friend> getAllFriendPages(@RequestParam("p") int page, @RequestParam("s") int size) {
 		Pageable paging = PageRequest.of(page, size);
 		return friendService.findAll(paging);
 
@@ -69,14 +82,27 @@ public class FriendController {
 	}
 
 	@PostMapping("/friend")
-	public void addFriend(@RequestBody Friend friend) {
-		friendService.save(friend);
+	public void addFriend(@Valid @RequestBody Friend friend) {
+		if (!friendService.existsById(friend.getId()) && friend.getFirstName() != null && friend.getLastName() != null)
+			friendService.save(friend);
+		else
+			throw new RuntimeException("Wrong input!");
 
 	}
+	/*
+	 * @ResponseStatus(HttpStatus.BAD_REQUEST)
+	 * 
+	 * @ExceptionHandler(RuntimeException.class) ErrorMessage
+	 * exceptionHandler(RuntimeException e) { return new
+	 * ErrorMessage(e.getMessage(), "400"); }
+	 */
 
 	@PutMapping("/friend")
-	public void updateFriend(@RequestBody Friend friend) {
-		friendService.save(friend);
+	public ResponseEntity<Friend> updateFriend(@RequestBody Friend friend) {
+		if (friendService.existsById(friend.getId()))
+			return new ResponseEntity(friendService.save(friend), HttpStatus.OK);
+		else
+			return new ResponseEntity(friend, HttpStatus.NOT_FOUND);
 
 	}
 
